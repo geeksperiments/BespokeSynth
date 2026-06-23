@@ -18,6 +18,7 @@ option(BESPOKE_SYSTEM_TUNING_LIBRARY "Use system installation of tuning-library"
 option(BESPOKE_SYSTEM_ABLETONLINK "Use system installation of abletonlink" OFF)
 option(BESPOKE_SYSTEM_READERWRITERQUEUE "Use system installation of readerwriterqueue" OFF)
 option(BESPOKE_USE_ASAN "Build with ASAN" OFF)
+option(BESPOKE_JACK "Build with JACK audio device support" OFF)
 
 # Global CMake options
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # clangd/LSP support

@@ -997,6 +997,10 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       mCaretPosition = 0;
       mCaretPosition2 = (int)mString.size();
    }
+   else if ((key == '/' || key == '?') && (GetKeyModifiers() & kModifier_Command))
+   {
+      ToggleComments();
+   }
    else if (key == juce::KeyPress::endKey)
    {
       MoveCaretToEnd();
@@ -1184,6 +1188,90 @@ void CodeEntry::ShiftLines(bool backwards)
 
    mCaretPosition = caretStart;
    mCaretPosition2 = caretEnd;
+}
+
+void CodeEntry::ToggleComments()
+{
+   int caretStart = MIN(mCaretPosition, mCaretPosition2);
+   int caretEnd = MAX(mCaretPosition, mCaretPosition2);
+   ofVec2f coordsStart = GetCaretCoords(caretStart);
+   ofVec2f coordsEnd = GetCaretCoords(caretEnd);
+   int lineStart = (int)coordsStart.y;
+   int lineEnd = (int)coordsEnd.y;
+   if (caretEnd > caretStart && coordsEnd.x == 0 && lineEnd > lineStart)
+      --lineEnd;
+
+   auto lines = GetLines(false);
+   if (lines.empty())
+      return;
+
+   lineStart = ofClamp(lineStart, 0, (int)lines.size() - 1);
+   lineEnd = ofClamp(lineEnd, 0, (int)lines.size() - 1);
+
+   bool shouldUncomment = true;
+   bool hasCommentableLine = false;
+   for (int i = lineStart; i <= lineEnd; ++i)
+   {
+      size_t firstNonSpace = lines[i].find_first_not_of(' ');
+      if (firstNonSpace == std::string::npos)
+         continue;
+
+      hasCommentableLine = true;
+      if (lines[i][firstNonSpace] != '#')
+      {
+         shouldUncomment = false;
+         break;
+      }
+   }
+
+   if (!hasCommentableLine)
+      shouldUncomment = false;
+
+   int originalCaretPosition = mCaretPosition;
+   int originalCaretPosition2 = mCaretPosition2;
+   int caretDelta = 0;
+   int caret2Delta = 0;
+
+   std::string newString;
+   for (int i = 0; i < (int)lines.size(); ++i)
+   {
+      int lineStartPosition = (int)newString.size();
+      int delta = 0;
+      if (i >= lineStart && i <= lineEnd)
+      {
+         size_t firstNonSpace = lines[i].find_first_not_of(' ');
+         if (firstNonSpace != std::string::npos)
+         {
+            if (shouldUncomment)
+            {
+               lines[i].erase(firstNonSpace, 1);
+               delta = -1;
+               if (firstNonSpace < lines[i].size() && lines[i][firstNonSpace] == ' ')
+               {
+                  lines[i].erase(firstNonSpace, 1);
+                  --delta;
+               }
+            }
+            else
+            {
+               lines[i].insert(firstNonSpace, "# ");
+               delta = 2;
+            }
+         }
+      }
+
+      int lineEndPosition = lineStartPosition + (int)lines[i].size();
+      newString += lines[i] + "\n";
+
+      if (originalCaretPosition > lineStartPosition && originalCaretPosition <= lineEndPosition)
+         caretDelta += delta;
+      if (originalCaretPosition2 > lineStartPosition && originalCaretPosition2 <= lineEndPosition)
+         caret2Delta += delta;
+   }
+
+   UpdateString(newString);
+   mCaretPosition = ofClamp(originalCaretPosition + caretDelta, 0, (int)mString.size());
+   mCaretPosition2 = ofClamp(originalCaretPosition2 + caret2Delta, 0, (int)mString.size());
 }
 
 void CodeEntry::MoveCaret(int pos, bool allowSelection /*=true*/)

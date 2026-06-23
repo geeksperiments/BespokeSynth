@@ -209,6 +209,7 @@
 #include "Push2Control.h"
 #include "PulseTrain.h"
 #include "NoteLatch.h"
+#include "SardineModule.h"
 #include "ScriptModule.h"
 #include "ScriptStatus.h"
 #include "ModulatorGravity.h"
@@ -443,6 +444,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(Push2Control, push2control, kModuleCategory_Other);
    REGISTER(PulseTrain, pulsetrain, kModuleCategory_Pulse);
    REGISTER(NoteLatch, notelatch, kModuleCategory_Note);
+   REGISTER(SardineModule, sardine, kModuleCategory_Instrument);
    REGISTER(ScriptModule, script, kModuleCategory_Other);
    REGISTER(ScriptStatus, scriptstatus, kModuleCategory_Other);
    REGISTER(ModulatorGravity, gravity, kModuleCategory_Modulator);

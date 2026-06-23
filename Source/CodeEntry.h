@@ -102,6 +102,7 @@ private:
    ofVec2f GetCaretCoords(int caret);
    void RemoveSelectedText();
    void ShiftLines(bool backwards);
+   void ToggleComments();
    void MoveCaret(int pos, bool allowSelection = true);
    void MoveCaretToStart();
    void MoveCaretToEnd();

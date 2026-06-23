@@ -662,6 +662,8 @@ target_sources(BespokeSynth PRIVATE
     ScaleDegree.h
     ScaleDetect.cpp
     ScaleDetect.h
+    SardineModule.cpp
+    SardineModule.h
     ScriptModule.cpp
     ScriptModule.h
     ScriptModule_PythonInterface.i
@@ -837,7 +839,7 @@ target_compile_definitions(BespokeSynth PRIVATE
     JUCE_COREGRAPHICS_DRAW_ASYNC=1
 
     JUCE_ALSA=1
-    JUCE_JACK=1
+    JUCE_JACK=$<BOOL:${BESPOKE_JACK}>
     JUCE_JACK_CLIENT_NAME="BespokeSynth"
 
     JUCE_WASAPI=1
