@@ -301,18 +301,19 @@ def CC(control, value, delay=0, channel=None, ch=None):
     sardine.send_cc(float(delay), int(control), int(value), _coerce_channel(channel))
 
 def _run_again_callback(callback_id):
-    callback = _AGAIN_CALLBACKS.pop(int(callback_id), None)
-    if callback is None:
+    event = _AGAIN_CALLBACKS.pop(int(callback_id), None)
+    if event is None:
         return
+    callback, args, kwargs = event
     globals()[callback.__name__] = callback
-    callback()
+    callback(*args, **kwargs)
 
-def again(delay, callback):
+def again(delay, callback, *args, **kwargs):
     if callable(callback):
         global _AGAIN_NEXT_ID
         callback_id = _AGAIN_NEXT_ID
         _AGAIN_NEXT_ID += 1
-        _AGAIN_CALLBACKS[callback_id] = callback
+        _AGAIN_CALLBACKS[callback_id] = (callback, args, kwargs)
         sardine.schedule(float(delay), "_run_again_callback(" + str(callback_id) + ")")
     else:
         sardine.schedule(float(delay), str(callback))
